@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="1000dp"
+    android:orientation="vertical" >
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="10dp"
+        android:orientation="horizontal" >
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal" >
+
+        <AutoCompleteTextView
+            android:id="@+id/recipientNumber"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:hint="@string/recipient" 
+            android:dropDownSelector="@android:drawable/list_selector_background"
+            android:clickable="true" >
+        </AutoCompleteTextView>
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:orientation="horizontal" >
+
+        <EditText
+            android:id="@+id/smsTextbox"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:ems="10"
+            android:gravity="top"
+            android:hint="@string/sms"
+            android:inputType="textMultiLine"
+            android:maxLength="100"
+            android:singleLine="false" />
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/remainingCharsBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/remainingChars"
+            android:textAppearance="?android:attr/textAppearanceSmall" >
+
+            <requestFocus />
+        </TextView>
+    </TableRow>
+
+    <TableRow
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:orientation="horizontal" >
+
+        <TextView
+            android:id="@+id/remainingTextsBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/remainingTexts"
+            android:textAppearance="?android:attr/textAppearanceSmall" />
+    </TableRow>
+
+    <TableRow
+        android:layout_width="100dp"
+        android:layout_height="50dp"
+        android:orientation="horizontal" >
+
+        <Button
+            android:id="@+id/sendButton"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:text="Send" />
+    </TableRow>
+
+</LinearLayout>

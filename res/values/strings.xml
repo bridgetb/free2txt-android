@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="hello">Hello World!</string>
+    <string name="app_name">Vodafone Free2Txt</string>
+    <string name="login">Login to Vodafone</string>
+    <string name="loginButton">Login</string>
+    <string name="cancelButton">Cancel</string>
+    <string name="username">Email/Mobile Number</string>
+    <string name="password">Password</string>
+    <string name="sms">Tap to compose</string>
+    <string name="recipient">To (642...)</string>
+    <string name="remainingTexts">You have 20 remaining texts today.</string>
+    <string name="remainingChars">100 remaining characters</string>
+
+</resources>
