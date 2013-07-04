@@ -149,7 +149,6 @@ public class MainActivity extends Activity {
 		
 		Element form = doc.getElementById("sendMessageForm");
 		String action = form.attr("action");
-		System.out.println(action);
 		if (action == null) {
 			return;
 		}
@@ -161,16 +160,6 @@ public class MainActivity extends Activity {
 			Editor ed = sp.edit();
 			ed.putString("sendHtml", result.toString());
 			ed.commit();
-			/*if (result == null) {
-				login();
-				doc = Jsoup.parse(html);
-				form = doc.getElementById("sendMessageForm");
-				action = form.attr("action");
-				SendSMSTask txtTask1 = new SendSMSTask(toNumber, sms, remainingTxts, html, getBaseContext().getFilesDir().getPath().toString());
-				txtTask1.execute(action);
-				result = txtTask.get();
-			}*/
-
 		} catch (InterruptedException e1) {
 		} catch (ExecutionException e1) {
 		}
@@ -182,13 +171,8 @@ public class MainActivity extends Activity {
 		try {
 			html = getter.execute();
 		} catch (ClientProtocolException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		/*SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-		String html = sp.getString("sendHtml", null);*/
-		
+		}	
 		return html;
 	}
 
@@ -198,12 +182,9 @@ public class MainActivity extends Activity {
 		tv.setText(remainingChars + " remaining characters");
 	}
 
-	private void refreshFields() {
+	private void refreshFields() throws NullPointerException {
 		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 		String html = sp.getString("sendHtml", getSendPage());
-		refreshFields(html);
-	}
-	private void refreshFields(String html) throws NullPointerException {
 		org.jsoup.nodes.Document doc = Jsoup.parse(html);
 		Element form = doc.body();
 		if (form.select("#sendMessageForm").first() != null) {
@@ -213,10 +194,8 @@ public class MainActivity extends Activity {
 			form = els.get(4);
 			form = form.select("#sendMessageForm").first();
 		}
-		System.out.println(form);
 		form = form.getElementsByClass("formCopyLeft").get(1);
 		String sentTxts = form.text();
-		System.out.println(sentTxts);
 		String[] sentTxtsSentence = sentTxts.split(" ");
 		TextView tv = (TextView)this.findViewById(R.id.remainingTextsBox);
 		int remaining = -1;
@@ -236,10 +215,16 @@ public class MainActivity extends Activity {
 			message.setText("");
 			Toast.makeText(this, "Message sent", Toast.LENGTH_SHORT).show();
 
-		} else {
+		} else if (remaining == remainingTxts) {
 			Toast.makeText(this, "Sorry, your message was not sent", Toast.LENGTH_SHORT).show();
 		}
 		remainingTxts = remaining;
+		
+		if (remainingTxts == 0) {
+			// Exit
+			Toast.makeText(this, "Sorry, you have used all 20 free texts today", Toast.LENGTH_SHORT).show();
+			
+		}
 	}
 }
 

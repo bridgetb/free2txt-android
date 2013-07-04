@@ -56,12 +56,10 @@ public class LoginActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-
-		
 		setContentView(R.layout.activity_login);
 
 		// Set up the login form.
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 		mUsername = sp.getString("username", null);
 		mEmailView = (EditText) findViewById(R.id.email);
 		mEmailView.setText(mUsername);
@@ -70,17 +68,17 @@ public class LoginActivity extends Activity {
 		mPasswordView = (EditText) findViewById(R.id.password);
 		mPasswordView.setText(mPassword);
 		mPasswordView
-				.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-					@Override
-					public boolean onEditorAction(TextView textView, int id,
-							KeyEvent keyEvent) {
-						if (id == R.id.login || id == EditorInfo.IME_NULL) {
-							attemptLogin();
-							return true;
-						}
-						return false;
-					}
-				});
+		.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+			@Override
+			public boolean onEditorAction(TextView textView, int id,
+					KeyEvent keyEvent) {
+				if (id == R.id.login || id == EditorInfo.IME_NULL) {
+					attemptLogin();
+					return true;
+				}
+				return false;
+			}
+		});
 
 		mLoginFormView = findViewById(R.id.login_form);
 		mLoginStatusView = findViewById(R.id.login_status);
@@ -93,6 +91,10 @@ public class LoginActivity extends Activity {
 						attemptLogin();
 					}
 				});
+		
+		if (mUsername != null && mPassword != null) {
+			attemptLogin();
+		}
 	}
 
 	@Override
@@ -119,7 +121,12 @@ public class LoginActivity extends Activity {
 		// Store values at the time of the login attempt.
 		mUsername = mEmailView.getText().toString();
 		mPassword = mPasswordView.getText().toString();
-
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+		Editor ed = sp.edit();
+		ed.putString("username", mUsername);
+		ed.putString("password", mPassword);
+		ed.commit();
+		
 		boolean cancel = false;
 		View focusView = null;
 
@@ -178,25 +185,25 @@ public class LoginActivity extends Activity {
 
 			mLoginStatusView.setVisibility(View.VISIBLE);
 			mLoginStatusView.animate().setDuration(shortAnimTime)
-					.alpha(show ? 1 : 0)
-					.setListener(new AnimatorListenerAdapter() {
-						@Override
-						public void onAnimationEnd(Animator animation) {
-							mLoginStatusView.setVisibility(show ? View.VISIBLE
-									: View.GONE);
-						}
-					});
+			.alpha(show ? 1 : 0)
+			.setListener(new AnimatorListenerAdapter() {
+				@Override
+				public void onAnimationEnd(Animator animation) {
+					mLoginStatusView.setVisibility(show ? View.VISIBLE
+							: View.GONE);
+				}
+			});
 
 			mLoginFormView.setVisibility(View.VISIBLE);
 			mLoginFormView.animate().setDuration(shortAnimTime)
-					.alpha(show ? 0 : 1)
-					.setListener(new AnimatorListenerAdapter() {
-						@Override
-						public void onAnimationEnd(Animator animation) {
-							mLoginFormView.setVisibility(show ? View.GONE
-									: View.VISIBLE);
-						}
-					});
+			.alpha(show ? 0 : 1)
+			.setListener(new AnimatorListenerAdapter() {
+				@Override
+				public void onAnimationEnd(Animator animation) {
+					mLoginFormView.setVisibility(show ? View.GONE
+							: View.VISIBLE);
+				}
+			});
 		} else {
 			// The ViewPropertyAnimator APIs are not available, so simply show
 			// and hide the relevant UI components.
@@ -212,13 +219,13 @@ public class LoginActivity extends Activity {
 	public class UserLoginTask extends AsyncTask<String, Object, Boolean> {
 		private Hashtable<String, String> logindata;
 		private String ret;
-		
+
 		public UserLoginTask(String username, String password) {
 			logindata = new Hashtable<String, String>();
 			logindata.put("username", username);
 			logindata.put("password", password);
 		}
-		
+
 		@Override
 		protected Boolean doInBackground(String... arg0) {
 			HttpPoster login = new HttpPoster();
@@ -253,7 +260,7 @@ public class LoginActivity extends Activity {
 				finish();
 			} else {
 				mPasswordView
-						.setError(getString(R.string.error_incorrect_password));
+				.setError(getString(R.string.error_incorrect_password));
 				mPasswordView.requestFocus();
 			}
 		}

@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="hello">Hello World!</string>
     <string name="app_name">Vodafone Free2Txt</string>
     <string name="login">Login to Vodafone</string>
     <string name="loginButton">Login</string>
