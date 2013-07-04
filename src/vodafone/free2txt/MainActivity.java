@@ -36,23 +36,7 @@ public class MainActivity extends Activity {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 		setContentView(R.layout.main);
-		/*try {
-			refreshFields();
-		} catch (NullPointerException e) {
-			Editor ed = sp.edit();
-			ed.remove("username");
-			ed.remove("password");
-			ed.commit();
-			Intent myIntent = new Intent(getBaseContext(), LoginActivity.class);
-			finish();
-//			startActivity(myIntent);
-			this.findViewById(R.id.smsTextbox).getContext().startActivity(myIntent);
-
-			//setContentView(R.layout.login);
-			return;
-		}*/
 
 		this.recipient = (AutoCompleteTextView)this.findViewById(R.id.recipientNumber);
 		/*Cursor contactCursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
@@ -113,7 +97,6 @@ public class MainActivity extends Activity {
 				if (c == null) 
 					return;
 				// Get action to execute (form id sendMessageForm)
-				//login();
 				sendSms(c, message.getText().toString());
 
 				// Reset number of remaining texts
@@ -129,7 +112,6 @@ public class MainActivity extends Activity {
 		if (c.contains("<")) 
 			c = c.substring(c.indexOf('<'), c.indexOf('>'));
 		if (c.length() < 9) {
-			//|| !recipient.getText().subSequence(0, 4).toString().equals(("+642")) || !recipient.getText().subSequence(0, 2).toString().equals(("02"))) {
 			Toast.makeText(this, "Invalid recipient number", Toast.LENGTH_SHORT).show();
 			return null;
 		}		
@@ -221,9 +203,7 @@ public class MainActivity extends Activity {
 		remainingTxts = remaining;
 		
 		if (remainingTxts == 0) {
-			// Exit
-			Toast.makeText(this, "Sorry, you have used all 20 free texts today", Toast.LENGTH_SHORT).show();
-			
+			Toast.makeText(this, "Sorry, you have used all 20 free texts today", Toast.LENGTH_SHORT).show();			
 		}
 	}
 }

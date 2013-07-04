@@ -234,11 +234,7 @@ public class LoginActivity extends Activity {
 			try {
 				loginPageString = loginPageGet.execute();
 			} catch (ClientProtocolException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
 			}
 
 			ret = login.getResponse(arg0[0], loginPageString, "loginHandler", logindata);

@@ -8,7 +8,6 @@ import java.util.Hashtable;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
@@ -66,63 +65,15 @@ public class HttpPoster {
 		List<BasicNameValuePair> nvps = getFormElements(html, element, attributes);
 		try {
 			httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
 			response = client.execute(httpost,localContext);
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		try {
 			return EntityUtils.toString(response.getEntity());
-		} catch (ParseException e) {
-			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+		} catch (ClientProtocolException e) {
 		} catch (IOException e) {
-			e.printStackTrace();
 		}
+
 		return null;
 
 	}
 	
-	public String getResponse(String uri, Hashtable<String, String> attributes)
-	{
-		HttpPost httpost = new HttpPost(uri);
-		HttpResponse response = null;
-		DefaultHttpClient client = new DefaultHttpClient();
-		BasicHttpContext localContext = new BasicHttpContext();
-
-		List<BasicNameValuePair>  nvps = new ArrayList<BasicNameValuePair> ();
-		Enumeration<String> en = attributes.keys();
-		while (en.hasMoreElements()) {
-			String k = en.nextElement();
-			String v = attributes.get(k);
-			nvps.add(new BasicNameValuePair(k,v));
-		}
-		try {
-			httpost.setEntity(new UrlEncodedFormEntity(nvps, HTTP.UTF_8));
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			response = client.execute(httpost,localContext);
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		try {
-			return EntityUtils.toString(response.getEntity());
-		} catch (ParseException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
-
-	}
 }
