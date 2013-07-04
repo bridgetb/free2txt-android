@@ -12,5 +12,6 @@
     <string name="recipient">To (642...)</string>
     <string name="remainingTexts">You have 20 remaining texts today.</string>
     <string name="remainingChars">100 remaining characters</string>
+    <string name="send">Send</string>
 
 </resources>

@@ -1,13 +1,14 @@
 package vodafone.free2txt;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
+import org.apache.http.client.ClientProtocolException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
@@ -26,37 +27,32 @@ public class MainActivity extends Activity {
 
 	private AutoCompleteTextView recipient;
 	private EditText message;
-//	private ArrayAdapter<String> contactslist;
-	
+	//	private ArrayAdapter<String> contactslist;
+
 	private int remainingChars = 100;
 	private int remainingTxts = -1;
-
-	private String free2txtHtml;
-	private String username;
-	private String password;
 
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
 
-		username = sp.getString("username", null);
-		password = sp.getString("password", null);
 		setContentView(R.layout.main);
-		try {
+		/*try {
 			refreshFields();
 		} catch (NullPointerException e) {
 			Editor ed = sp.edit();
 			ed.remove("username");
 			ed.remove("password");
 			ed.commit();
-			//finish();
 			Intent myIntent = new Intent(getBaseContext(), LoginActivity.class);
+			finish();
+//			startActivity(myIntent);
 			this.findViewById(R.id.smsTextbox).getContext().startActivity(myIntent);
+
 			//setContentView(R.layout.login);
 			return;
-		}
+		}*/
 
 		this.recipient = (AutoCompleteTextView)this.findViewById(R.id.recipientNumber);
 		/*Cursor contactCursor = getContentResolver().query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null,
@@ -74,9 +70,9 @@ public class MainActivity extends Activity {
 			System.out.println(contact);
 		} while (contactCursor.moveToNext());
 		contactCursor.close();
-		
+
 		contactslist.setNotifyOnChange(true);
-		
+
 		recipient.setAdapter(contactslist);		
 		recipient.setOnItemClickListener(new OnItemClickListener() {
 			@Override
@@ -90,7 +86,7 @@ public class MainActivity extends Activity {
 		});
 //		recipient.setActivated(true);
 		recipient.setListSelection(0);*/
-		
+
 		this.message = (EditText)this.findViewById(R.id.smsTextbox);
 		message.addTextChangedListener(new TextWatcher() {
 			@Override
@@ -117,13 +113,15 @@ public class MainActivity extends Activity {
 				if (c == null) 
 					return;
 				// Get action to execute (form id sendMessageForm)
-				login();
+				//login();
 				sendSms(c, message.getText().toString());
 
 				// Reset number of remaining texts
 				refreshFields();
 			}
 		});
+		
+		refreshFields();
 	}
 
 	private String getRecipient() {
@@ -132,8 +130,7 @@ public class MainActivity extends Activity {
 			c = c.substring(c.indexOf('<'), c.indexOf('>'));
 		if (c.length() < 9) {
 			//|| !recipient.getText().subSequence(0, 4).toString().equals(("+642")) || !recipient.getText().subSequence(0, 2).toString().equals(("02"))) {
-			// TODO: Handle invalid recipient number
-
+			Toast.makeText(this, "Invalid recipient number", Toast.LENGTH_SHORT).show();
 			return null;
 		}		
 		if (c.startsWith("0"))
@@ -141,47 +138,58 @@ public class MainActivity extends Activity {
 
 		if (c.startsWith("+"))
 			c = c.substring(1);
-		
+
 		return c;
 	}
-	private void login() {
-		LoginTask task = new LoginTask(username, password);
-		task.execute("https://www.vodafone.co.nz/knox/login_handler.jsp?pcode=mvf&template=myvodafone&url=https://www.vodafone.co.nz/myvodafone/free2TXT");
-		Object result;
-		try {
-			result = task.get();
-			if (result == null) {
-				return;
-			}
-			free2txtHtml = result.toString();
-
-		} catch (InterruptedException e1) {
-		} catch (ExecutionException e1) {
-		}
-	}
-
+	
 	private void sendSms(String toNumber, String sms) {
-		org.jsoup.nodes.Document doc = Jsoup.parse(free2txtHtml);
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+		String html = sp.getString("sendHtml", getSendPage());
+		org.jsoup.nodes.Document doc = Jsoup.parse(html);
+		
 		Element form = doc.getElementById("sendMessageForm");
 		String action = form.attr("action");
-		SendSMSTask txtTask = new SendSMSTask(toNumber, sms, free2txtHtml, getBaseContext().getFilesDir().getPath().toString());
+		System.out.println(action);
+		if (action == null) {
+			return;
+		}
+		SendSMSTask txtTask = new SendSMSTask(toNumber, sms, remainingTxts, html, getBaseContext().getFilesDir().getPath().toString());
 		txtTask.execute(action);
 		Object result;
 		try {
 			result = txtTask.get();
-			if (result == null) {
+			Editor ed = sp.edit();
+			ed.putString("sendHtml", result.toString());
+			ed.commit();
+			/*if (result == null) {
 				login();
-				doc = Jsoup.parse(free2txtHtml);
+				doc = Jsoup.parse(html);
 				form = doc.getElementById("sendMessageForm");
 				action = form.attr("action");
-				SendSMSTask txtTask1 = new SendSMSTask(toNumber, sms, free2txtHtml, getBaseContext().getFilesDir().getPath().toString());
+				SendSMSTask txtTask1 = new SendSMSTask(toNumber, sms, remainingTxts, html, getBaseContext().getFilesDir().getPath().toString());
 				txtTask1.execute(action);
 				result = txtTask.get();
-			}
+			}*/
 
 		} catch (InterruptedException e1) {
 		} catch (ExecutionException e1) {
 		}
+	}
+
+	private String getSendPage() {
+		HttpGetter getter = new HttpGetter("https://www.vodafone.co.nz/myvodafone/free2TXT");
+		String html = null;
+		try {
+			html = getter.execute();
+		} catch (ClientProtocolException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		/*SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+		String html = sp.getString("sendHtml", null);*/
+		
+		return html;
 	}
 
 	private void changeRemainingChars(int change) {
@@ -190,15 +198,25 @@ public class MainActivity extends Activity {
 		tv.setText(remainingChars + " remaining characters");
 	}
 
-	private void refreshFields() throws NullPointerException {
-		login();
-		org.jsoup.nodes.Document doc = Jsoup.parse(free2txtHtml);
+	private void refreshFields() {
+		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+		String html = sp.getString("sendHtml", getSendPage());
+		refreshFields(html);
+	}
+	private void refreshFields(String html) throws NullPointerException {
+		org.jsoup.nodes.Document doc = Jsoup.parse(html);
 		Element form = doc.body();
-		Elements els = form.children();
-		form = els.get(4);
-		form = form.getElementById("sendMessageForm");
+		if (form.select("#sendMessageForm").first() != null) {
+			form = form.select("#sendMessageForm").first();
+		} else {
+			Elements els = form.children();
+			form = els.get(4);
+			form = form.select("#sendMessageForm").first();
+		}
+		System.out.println(form);
 		form = form.getElementsByClass("formCopyLeft").get(1);
 		String sentTxts = form.text();
+		System.out.println(sentTxts);
 		String[] sentTxtsSentence = sentTxts.split(" ");
 		TextView tv = (TextView)this.findViewById(R.id.remainingTextsBox);
 		int remaining = -1;
@@ -218,14 +236,8 @@ public class MainActivity extends Activity {
 			message.setText("");
 			Toast.makeText(this, "Message sent", Toast.LENGTH_SHORT).show();
 
-		} else if (remaining == remainingTxts) {
-			String rec = getRecipient();
-			if (rec != null) {				
-				String msg = message.getText().toString();
-				// Resend text?
-				sendSms(rec, msg);
-				refreshFields();
-			}
+		} else {
+			Toast.makeText(this, "Sorry, your message was not sent", Toast.LENGTH_SHORT).show();
 		}
 		remainingTxts = remaining;
 	}

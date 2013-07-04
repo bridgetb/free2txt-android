@@ -80,7 +80,7 @@
             android:id="@+id/sendButton"
             android:layout_width="100dp"
             android:layout_height="wrap_content"
-            android:text="Send" />
+            android:text="@string/send" />
     </TableRow>
 
 </LinearLayout>
